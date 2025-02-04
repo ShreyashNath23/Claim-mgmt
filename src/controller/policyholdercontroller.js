@@ -6,6 +6,16 @@ module.exports = {
   createPolicyHolder: async (req, res) => {
     if (!policy.has(req.body.policyid)) {
       return res.status(400).json("This Policy does not exist");
+    } else {
+      const policyInfo = policy.get(req.body.policyid);
+      const maxAmount = policyInfo.maxamount;
+      if (req.body.amount > maxAmount) {
+        return res
+          .status(401)
+          .json(
+            "Amount is more than the maximum amount allowed under this policy"
+          );
+      }
     }
     const newPolicyHolder = new policyHolder(
       req.body.policyholderid,
@@ -13,36 +23,82 @@ module.exports = {
       req.body.name,
       req.body.amount
     );
-    policyholder.set(req.body.policyholderid, newPolicyHolder);
+
+    if (!policyholder.has(req.body.policyholderid)) {
+      policyholder.set(req.body.policyholderid, []);
+    }
+
+    const policyHolderInfo = policyholder.get(req.body.policyholderid);
+
+    const searchPolicyId = policyHolderInfo.find(
+      (policy) => policy.policyid === req.body.policyid
+    );
+
+    if (searchPolicyId) {
+      return res
+        .status(400)
+        .json(
+          "This policy already exists for this user, please update for any changes"
+        );
+    }
+
+    // policyHolderInfo.push(newPolicyHolder);
+    policyholder.get(req.body.policyholderid).push(newPolicyHolder);
     res.status(201).json(Array.from(policyholder.values()));
   },
+
   getPolicyHolder: (req, res) => {
-    res.json(Array.from(policyholder.values()));
+    const policyHolderInfo = policyholder.get(req.body.policyholderid);
+    if (policyHolderInfo) {
+      res.status(200).json(policyHolderInfo);
+    } else {
+      res.json("This policyholder does not exist");
+    }
+    // res.json(Array.from(policyholder.values()));
   },
-  // updatePolicyHolder: async (req, res) => {
-  //   //Check karo ki policyholder for specific policy exist or not
-  //   if (
-  //     policyholder.has(req.body.policyholderid) &&
-  //     policyholder.has(req.body.policyid)
-  //   ) {
-  //     policyholder.delete(req.body.policyholderid);
-  //     res.json(Array.from(policyholder.values()));
-  //   } else {
-  //     res.status(400), json("Sorry, you can not update this policy");
-  //   }
-  // },
+
+  updatePolicyHolder: async (req, res) => {
+    if (policyholder.has(req.body.policyholderid)) {
+      const policyHolderInfo = policyholder.get(req.body.policyholderid);
+      const specificPolicy = policyHolderInfo
+        .flat()
+        .find((policy) => policy.policyid === req.body.policyid);
+      if (specificPolicy) {
+        if (req.body.policyid) specificPolicy.policyid = req.body.policyid;
+        if (req.body.amount) specificPolicy.amount = req.body.amount;
+        if (req.body.name) specificPolicy.name = req.body.name;
+        res.json(Array.from(policyholder.values()));
+      } else {
+        res.status(400).json("Wrong policy Selected");
+      }
+    } else {
+      res.status(400).json("This policyholder does not exist");
+    }
+  },
+
   deletePolicyHolder: async (req, res) => {
     if (policyholder.has(req.body.policyholderid)) {
       const policyHolderInfo = policyholder.get(req.body.policyholderid);
-      const policyInfo = policyHolderInfo.policyid;
-      if (policyInfo === req.body.policyid) {
-        policyholder.delete(req.body.policyholderid);
-        res.status(200).json(Array.from(policyholder.values()));
+      // console.log(typeof policyHolderInfo);
+      if (req.body.policyid) {
+        const specificPolicyIndex = policyHolderInfo
+          .flat()
+          .findIndex((policy) => policy.policyid === req.body.policyid);
+        if (specificPolicyIndex !== -1) {
+          policyHolderInfo.splice(specificPolicyIndex, 1);
+          return res.status(200).json(policyholder);
+        } else {
+          return res.status(404).json("You do not have this policy");
+        }
       } else {
-        res.status(400), json("Sorry, you can not have the access delete this");
+        policyholder.delete(req.body.policyholderid);
       }
     } else {
-      res.status(400), json("Sorry, you can not have the access delete this");
+      res
+        .status(400)
+        .json(
+          "Sorry, you can not have the access delete this or this policy holder does not"
+        );
     }
   },
 };

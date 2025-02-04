@@ -7,6 +7,7 @@ const policycontroller = require("../controller/policycontroller");
 router.post("/", policycontroller.createPolicy);
 router.get("/", policycontroller.getPolicy);
 router.post("/delete", policycontroller.deletePolicy);
+router.post("/update", policycontroller.updatePolicy);
 
 // console.log(router);
 

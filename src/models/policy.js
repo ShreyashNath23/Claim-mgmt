@@ -1,6 +1,8 @@
 class policy {
-  constructor(policyid, policyholderid, amount) {
+  constructor(policyid, des, maxamount) {
     this.policyid = policyid;
+    this.des = des;
+    this.maxamount = maxamount;
     // this.policyid = policyid;
     // this.policyholderid = policyholderid;
     // this.amount = amount;

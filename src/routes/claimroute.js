@@ -8,5 +8,6 @@ const claimcontroller = require("../controller/claimcontroller");
 router.post("/", claimcontroller.createClaims);
 router.get("/", claimcontroller.getClaims);
 router.post("/delete", claimcontroller.deleteClaim);
+router.post("/update", claimcontroller.updateClaim);
 
 module.exports = router;
