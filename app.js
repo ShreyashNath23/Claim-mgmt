@@ -7,42 +7,42 @@ app.use(cors());
 app.use(express.json()); //why??
 require("dotenv").config();
 
-// const swaggerOptions = {
-//   definition: {
-//     openapi: "3.0.0",
-//     info: {
-//       title: "Insurance API",
-//       version: "1.0.0",
-//       description: "API for managing policies, policyholders, and claims",
-//     },
-//     servers: [{ url: "http://localhost:3000" }],
-//     components: {
-//       schemas: {
-//         Policy: {
-//           /* ... */
-//         },
-//         PolicyHolder: {
-//           /* ... */
-//         },
-//         Claim: {
-//           /* ... */
-//         },
-//       },
-//       securitySchemes: {
-//         bearerAuth: {
-//           type: "http",
-//           scheme: "bearer",
-//           bearerFormat: "JWT",
-//         },
-//       },
-//     },
-//     security: [{ bearerAuth: [] }],
-//   },
-//   apis: ["./src/routes/*.js", "./app.js"],
-// };
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Insurance API",
+      version: "1.0.0",
+      description: "API for managing policies, policyholders, and claims",
+    },
+    servers: [{ url: "http://localhost:3000" }],
+    components: {
+      schemas: {
+        Policy: {
+          /* ... */
+        },
+        PolicyHolder: {
+          /* ... */
+        },
+        Claim: {
+          /* ... */
+        },
+      },
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
+  },
+  apis: ["./src/routes/*.js", "./app.js"],
+};
 
-// const swaggerSpec = swaggerJSDoc(swaggerOptions);
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ----------------------------------------
 // const jwt = require("jsonwebtoken");
 // const { authenticateJWT } = require("./middleware/jwt");
